@@ -6,3 +6,6 @@ add_subdirectory(../reactor-uc reactor-uc)
 add_executable(Shutdown shutdown.c)
 target_link_libraries(Shutdown PRIVATE reactor-uc)
 
+add_executable(Solution shutdown_solution.c)
+target_link_libraries(Solution PRIVATE reactor-uc)
+

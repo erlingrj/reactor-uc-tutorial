@@ -1,12 +1,13 @@
-
 #include "reactor-uc/reactor-uc.h"
 
+// Reactor preambles
+
+        
 // Reaction structs
 DEFINE_REACTION_STRUCT(Reactor_Shutdown, reaction0, 0);
 DEFINE_REACTION_STRUCT(Reactor_Shutdown, reaction1, 0);
-
 // Timer structs 
-// TODO: You need to define the timer struct here!
+DEFINE_TIMER_STRUCT(Reactor_Shutdown, t, 1, 0);
 DEFINE_STARTUP_STRUCT(Reactor_Shutdown, 1, 0);
 DEFINE_SHUTDOWN_STRUCT(Reactor_Shutdown, 1, 0);
 // Port structs
@@ -21,7 +22,7 @@ typedef struct {
   REACTION_INSTANCE(Reactor_Shutdown, reaction0);
   REACTION_INSTANCE(Reactor_Shutdown, reaction1);
   // Timers
-  // TODO: The timer should be part of this reactor struct
+  TIMER_INSTANCE(Reactor_Shutdown, t);
   // Actions and builtin triggers
   
   STARTUP_INSTANCE(Reactor_Shutdown);SHUTDOWN_INSTANCE(Reactor_Shutdown);
@@ -32,12 +33,10 @@ typedef struct {
   // State variables 
   // Reactor parameters
   
-  // TODO: this needs to be updated
-  REACTOR_BOOKKEEPING_INSTANCES(2, 2, 0);
+  REACTOR_BOOKKEEPING_INSTANCES(2, 3, 0);
 } Reactor_Shutdown;
 
 REACTOR_CTOR_SIGNATURE(Reactor_Shutdown);
-
 
 // Reaction bodies
 DEFINE_REACTION_BODY(Reactor_Shutdown, reaction0) {
@@ -45,7 +44,7 @@ DEFINE_REACTION_BODY(Reactor_Shutdown, reaction0) {
   SCOPE_SELF(Reactor_Shutdown);
   SCOPE_ENV();
   SCOPE_STARTUP(Reactor_Shutdown);
-  // TODO: You need to scope the timer here
+  SCOPE_TIMER(Reactor_Shutdown, t);
          
   // Start of user-witten reaction body
   printf("startup ...");
@@ -65,8 +64,7 @@ DEFINE_REACTION_CTOR(Reactor_Shutdown, reaction1, 1);
 DEFINE_STARTUP_CTOR(Reactor_Shutdown);
 DEFINE_SHUTDOWN_CTOR(Reactor_Shutdown);
 // Timer constructors 
-// TODO: You need to construct the timer here!
-
+DEFINE_TIMER_CTOR(Reactor_Shutdown, t, 1, 0);
 // Port constructors
 
 // Connection constructors
@@ -78,7 +76,7 @@ REACTOR_CTOR_SIGNATURE(Reactor_Shutdown) {
    
         
    // Initialize Timers
-   // TODO: You need to initialize the timer here!
+   INITIALIZE_TIMER(Reactor_Shutdown, t, SEC(1), SEC(1));
    // Initialize actions and builtin triggers
    
    INITIALIZE_STARTUP(Reactor_Shutdown);
@@ -92,13 +90,14 @@ REACTOR_CTOR_SIGNATURE(Reactor_Shutdown) {
    // Initialize Reactions 
    INITIALIZE_REACTION(Reactor_Shutdown, reaction0);
      STARTUP_REGISTER_EFFECT(self->reaction0);
-     // TODO: reaction0 now can be triggered by the timer
+     TIMER_REGISTER_EFFECT(self->t, self->reaction0);
            
            
    INITIALIZE_REACTION(Reactor_Shutdown, reaction1);
      SHUTDOWN_REGISTER_EFFECT(self->reaction1);
            
 }
+
 
 ENTRY_POINT(Reactor_Shutdown, FOREVER, false);
 
