@@ -1,0 +1,37 @@
+target uC;
+
+reactor R1 {
+  output out:int
+  state cnt:int = 0
+
+  logical action a
+
+  reaction(a, startup) -> a, out {=
+    lf_set(out, self->cnt++);
+    lf_schedule(a, MSEC(100 * self->cnt));
+  =}
+}
+
+reactor Wrapper {
+  output out:int
+  r = new R1()
+
+  reaction(r.out) -> out {=
+    lf_set(out, r.out->value);
+  =}
+}
+
+reactor Sink {
+  input in:int
+  state cnt:int = 0
+  reaction(in) {=
+    printf("Received %d at %ld ms\n", in->value, env->get_elapsed_logical_time(env)/MSEC(1));
+    validate(in->value == self->cnt++);
+  =}
+}
+
+main reactor {
+  src = new Wrapper()
+  sink = new Sink()
+  src.out -> sink.in
+}
