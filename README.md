@@ -1,9 +1,8 @@
 # Reactor-uc tutorials
 
 ## Requirements
-- cmake
-- gcc
-- 
+- cmake v3.5 or greater
+- Java 17
 
 
 
